@@ -129,11 +129,16 @@ public:
 
 	Object* addObject (Object* candidate, ObjectTypes type)
 	{
+		std::cout << "new object" << std::endl;
 		if (objectArrays.size () < (int)type)
 		{
-			std::vector <Object*> x;
-			objectArrays.push_back (x);
+			for (int i = objectArrays.size () - 1; i < (int)type; i++)
+			{
+				objectArrays.push_back (std::vector <Object*> ());
+				std::cout << "added new vector" << std::endl;
+			}
 		}
+		std::cout << "added new object" << std::endl;
 		objectArrays [(int)type].push_back (candidate);
 
 		return objectArrays [(int)type].back ();
