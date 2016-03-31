@@ -15,9 +15,15 @@ class Object
 {
 public:
 	//constructor is based on vector2f
-	Object (sf::Vector2f pos);
+	Object (sf::Vector2f pos)
+	{
+		_points.push_back (pos);
+	}
 	//constructor is based on vector <vector2f>
-	Object (std::vector <sf::Vector2f> points);
+	Object (std::vector <sf::Vector2f> points) :
+		_points (points)
+	{ }
+	
 	~Object ()
 	{ }
 
@@ -35,8 +41,14 @@ public:
 class Static : public Object
 {
 public:
-	Static (sf::Vector2f pos);
-	Static (std::vector <sf::Vector2f> points);
+	Static (sf::Vector2f pos) :
+		Object (pos)
+	{ }
+
+	Static (std::vector <sf::Vector2f> points) :
+		Object (points)
+	{ }
+	
 	~Static () 
 	{ }
 	
@@ -49,18 +61,28 @@ public:
 class Rectangle : public Static
 {
 public:
-	Rectangle (std::vector <sf::Vector2f> point);
+	Rectangle (std::vector <sf::Vector2f> points) :
+		Static (points)
+	{ }
 	~Rectangle ();
 
-	bool is_inside (sf::Vector2f point);
+	bool is_inside (sf::Vector2f point)
+	{
+		return false;
+	}
 };
 
 //Object->Dymanic
 class Dynamic : public Object
 {
 public:
-	Dynamic (sf::Vector2f pos);
-	Dynamic (std::vector <sf::Vector2f> points);
+	Dynamic (sf::Vector2f pos) :
+		Object (pos)
+	{ }
+
+	Dynamic (std::vector <sf::Vector2f> points) :
+		Object (points)
+	{ }
 	~Dynamic ()
 	{ }
 	
@@ -74,13 +96,24 @@ class Hero : public Dynamic
 	float _radius;
 	
 public:
-	Hero (sf::Vector2f pos);
-	Hero (std::vector <sf::Vector2f> points, float radius);
-	~Hero ();
+	Hero (sf::Vector2f pos) :
+		Dynamic (pos)
+	{ }
+	Hero (std::vector <sf::Vector2f> points, float radius) :
+		Dynamic (points),
+		_radius (_radius)
+	{ }
 	
-	bool is_inside (sf::Vector2f point);
+	~Hero ()
+	{ }
 	
-	void integrate (float dt);
+	bool is_inside (sf::Vector2f point)
+	{
+		return false;
+	}
+	
+	void integrate (float dt)
+	{ }
 };
 
 
@@ -91,10 +124,22 @@ class ParticleSystem
 
 	//ObjectTypes types;
 public:
-	ParticleSystem ();
+	ParticleSystem ()
+	{ }
 
-	Object* addObject (Object* candidate, ObjectTypes type);
-	void	update ();
+	Object* addObject (Object* candidate, ObjectTypes type)
+	{
+		if (objectArrays.size () < (int)type)
+		{
+			std::vector <Object*> x;
+			objectArrays.push_back (x);
+		}
+		objectArrays [(int)type].push_back (candidate);
+
+		return objectArrays [(int)type].back ();
+	}
+	void	update ()
+	{ }
 };
 
 
