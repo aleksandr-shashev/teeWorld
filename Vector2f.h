@@ -15,7 +15,7 @@ public:
 	Vector2f GetNorm ();
 	
 	float x;
-    float y;
+	float y;
 };
 
 Vector2f Add (Vector2f v0, Vector2f v1);
