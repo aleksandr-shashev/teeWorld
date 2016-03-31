@@ -140,6 +140,13 @@ public:
 	}
 	void	update ()
 	{ }
+
+	Object* getObject (ObjectTypes type, int pos)
+	{
+		if ((int)type < objectArrays.size () && pos < objectArrays [(int)type].size ())
+			return objectArrays [(int)type] [pos];
+		return NULL;
+	}
 };
 
 
