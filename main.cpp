@@ -4,10 +4,9 @@
 
 int main ()
 {
-	std::cout << "Hello, World!";
 	ParticleSystem sys;
 
-	Hero* gish = new Hero (sf::Vector2f (100.0f, 100.0f));
+	Hero* gish = new Hero;
 
 	sys.addObject (gish, HERO);
 

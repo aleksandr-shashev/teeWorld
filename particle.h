@@ -1,5 +1,4 @@
-#ifndef PARTICLE
-#define PARTICLE
+#pragma once
 
 #include "vector2f.h"
 #include <vector>
@@ -96,4 +95,3 @@ private:
 	float initialVolume;
 	float atmosphericPressure;
 };
-#endif
