@@ -9,50 +9,52 @@
 #include "defines.h"
 //#include "Gish.h"
 #include "vector2f.h"
+#include "particle.h"
+
 
 //parent
 class Object
 {
 public:
-	//constructor is based on vector2f
-	Object (sf::Vector2f pos)
-	{
-		_points.push_back (pos);
-	}
-	//constructor is based on vector <vector2f>
-	Object (std::vector <sf::Vector2f> points) :
-		_points (points)
+	Object ()
 	{ }
-	
+
 	~Object ()
 	{ }
 
 	//Object position
-	std::vector <sf::Vector2f> _points;
+	std::vector <Particle*> _particles;
 	//Is _pos a centre of figure or not 
 	bool is_center;
 	//Is test point inside of object or not
-	virtual bool is_inside (sf::Vector2f point) = 0;
+	virtual bool is_inside (Vector2f point) = 0;
 	//this method only need to Dynamic objects
 	virtual void integrate (float dt) = 0;
+
+	Particle* addParticle (Vector2f pos, float radius)
+	{
+		Particle* newbie = new Particle;
+		newbie->pos = pos;
+		newbie->prevPos = newbie->pos;
+		newbie->acceleration = Vector2f (0.0f, 10.0f);
+		newbie->radius = radius;
+		_particles.push_back (newbie);
+
+		return newbie;
+	}
 };
 
 //Object->Static
 class Static : public Object
 {
 public:
-	Static (sf::Vector2f pos) :
-		Object (pos)
+	Static ()
 	{ }
 
-	Static (std::vector <sf::Vector2f> points) :
-		Object (points)
-	{ }
-	
 	~Static () 
 	{ }
 	
-	virtual bool is_inside (sf::Vector2f point) = 0;
+	virtual bool is_inside (Vector2f point) = 0;
 	//In Static object we don't use integrate method
 	void integrate (float dt) { };
 };
@@ -61,12 +63,12 @@ public:
 class Rectangle : public Static
 {
 public:
-	Rectangle (std::vector <sf::Vector2f> points) :
-		Static (points)
+	Rectangle ()
 	{ }
-	~Rectangle ();
+	~Rectangle ()
+	{ }
 
-	bool is_inside (sf::Vector2f point)
+	bool is_inside (Vector2f point)
 	{
 		return false;
 	}
@@ -76,44 +78,123 @@ public:
 class Dynamic : public Object
 {
 public:
-	Dynamic (sf::Vector2f pos) :
-		Object (pos)
+	Dynamic ()
 	{ }
-
-	Dynamic (std::vector <sf::Vector2f> points) :
-		Object (points)
-	{ }
+	
 	~Dynamic ()
 	{ }
 	
-	virtual bool is_inside (sf::Vector2f point) = 0;
+	virtual bool is_inside (Vector2f point) = 0;
 	virtual void integrate (float dt) = 0;
 };
 
 //Object->Dymanic->Hero
 class Hero : public Dynamic
 {
-	float _radius;
-	
+	float step = 0.04f;
+	std::vector<Link*> links;
+	VolumeLink* volumeLink;
+
 public:
-	Hero (sf::Vector2f pos) :
-		Dynamic (pos)
+	Hero ()
 	{ }
-	Hero (std::vector <sf::Vector2f> points, float radius) :
-		Dynamic (points),
-		_radius (_radius)
-	{ }
-	
+
 	~Hero ()
 	{ }
 	
-	bool is_inside (sf::Vector2f point)
+	bool is_inside (Vector2f point)
 	{
 		return false;
 	}
-	
+
+	VolumeLink* AddVolumeLink (std::vector<Particle*> particles)
+	{
+		volumeLink = new VolumeLink (particles);
+		return volumeLink;
+	}
+
+	Link* AddLink (Particle* p0, Particle* p1, float stiffness, float mult)
+	{
+		Link* newLink = new Link (p0, p1, stiffness, mult);
+
+		links.push_back (newLink);
+		return newLink;
+	}
+
 	void integrate (float dt)
-	{ }
+	{
+		for (size_t particleIndex = 0;
+		particleIndex < _particles.size (); particleIndex++)
+		{
+			_particles [particleIndex]->Integrate (1e-2f);
+
+			float floorLevel = 1700;
+			float wall = 2000;
+			if (_particles [particleIndex]->pos.y > floorLevel)
+			{
+				_particles [particleIndex]->pos.y = floorLevel;
+				_particles [particleIndex]->prevPos.x = _particles [particleIndex]->pos.x;
+			}
+			if (_particles [particleIndex]->pos.y < 0)
+			{
+				_particles [particleIndex]->pos.y = 0;
+				_particles [particleIndex]->prevPos.x = _particles [particleIndex]->pos.x;
+			}
+			if (_particles [particleIndex]->pos.x < 0)
+			{
+				_particles [particleIndex]->pos.x = 0;
+				_particles [particleIndex]->prevPos.y = _particles [particleIndex]->pos.y;
+			}
+			if (_particles [particleIndex]->pos.x > wall)
+			{
+				_particles [particleIndex]->pos.x = wall;
+				_particles [particleIndex]->prevPos.y = _particles [particleIndex]->pos.y;
+			}
+
+		}
+
+		for (size_t linkIndex = 0;
+		linkIndex < links.size (); linkIndex++)
+		{
+			links [linkIndex]->Solve ();
+		}
+
+		volumeLink->Solve ();
+	}
+
+	void Right ()
+	{
+		for (int i = 0; i < _particles.size (); i++)
+			_particles [i]->pos = _particles [i]->pos + Vector2f (step, 0.0f);
+	}
+	void Left ()
+	{
+		for (int i = 0; i < _particles.size (); i++)
+			_particles [i]->pos = _particles [i]->pos + Vector2f (-step, 0.0f);
+	}
+	void Up ()
+	{
+		for (int i = 0; i < _particles.size (); i++)
+			_particles [i]->pos = _particles [i]->pos + Vector2f (0.0f, -step);
+	}
+	void Down ()
+	{
+		for (int i = 0; i < _particles.size (); i++)
+			_particles [i]->pos = _particles [i]->pos + Vector2f (0.0f, step);
+	}
+	Particle* GetParticle (int particleIndex)
+	{
+		return _particles [particleIndex];
+	}
+
+	size_t GetParticleCount ()
+	{
+		return _particles.size ();
+	}
+	std::vector<Particle*>& getParticleVector ()
+	{
+		return _particles;
+	}
 };
 
 
