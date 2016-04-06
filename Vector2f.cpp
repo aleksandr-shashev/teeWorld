@@ -1,40 +1,8 @@
 #pragma once
-
 #include <iostream>
 #include <string>
-
 #include "Vector2f.h"
 
-Vector2f::Vector2f ()
-{
-	x = 0.0f;
-	y = 0.0f;
-}
-Vector2f::Vector2f (float _x, float _y)
-{
-	x = _x;
-	this->y = _y;
-}
-Vector2f::~Vector2f ()
-{ }
-
-void Vector2f::Print ()
-{
-	std::cout <<
-		"x: " << x << "\n" <<
-		"y: " << y << "\n";
-}
-float Vector2f::Length ()
-{
-	return sqrt (x*x + y*y);
-}
-
-Vector2f Vector2f::GetNorm ()
-{
-	return Vector2f (x / Length (), y / Length ());
-}
-
-//=============================================================================
 Vector2f Add (Vector2f v0, Vector2f v1)
 {
 	return Vector2f (v0.x + v1.x, v0.y + v1.y);

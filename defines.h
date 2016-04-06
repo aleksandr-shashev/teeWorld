@@ -1,7 +1,8 @@
 #pragma once
-//Types enum (numbers of lines in Object array)
-enum ObjectTypes
+
+enum ObjectTypes //Types enum (numbers of lines in Object array)
 {
 	RECTANGLE = 0,
-	HERO
+	HERO,
+	END
 };

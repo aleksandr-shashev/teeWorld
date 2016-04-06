@@ -8,8 +8,11 @@
 class Particle
 {
 public:
-	void Integrate (float dt)
-	{
+	Particle() {}
+	Particle(Vector2f pos) {
+		this->pos = pos;
+	}
+	void Integrate (float dt) {
 		Vector2f currPos = pos;
 		pos = pos + (pos - prevPos) + acceleration * dt * dt;
 		prevPos = currPos;
@@ -57,9 +60,9 @@ public:
 
 	VolumeLink (std::vector<Particle*> particles) :
 		particlesTop (particles),
-		initialPressure (0.1),
+		initialPressure (0.2f),
 		initialVolume (calcVolume ()),
-		atmosphericPressure (0.1)
+		atmosphericPressure (0.1f)
 	{ }
 
 	void Solve ()
