@@ -3,7 +3,7 @@
 #include "vector2f.h"
 #include <vector>
 #include <math.h>
-#include <iostream>
+//#include <iostream>
 
 class Particle
 {
@@ -58,11 +58,13 @@ public:
 	VolumeLink ()
 	{ }
 
-	VolumeLink (std::vector<Particle*> particles) :
+	VolumeLink (std::vector<Particle*> particles, 
+				float initialPressure = 0.1f, 
+				float atmosphericPressure = 0.1f) :
 		particlesTop (particles),
-		initialPressure (0.2f),
+		initialPressure (initialPressure),
 		initialVolume (calcVolume ()),
-		atmosphericPressure (0.1f)
+		atmosphericPressure (atmosphericPressure)
 	{ }
 
 	void Solve ()

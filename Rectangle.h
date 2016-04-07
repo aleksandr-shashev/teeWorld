@@ -9,6 +9,8 @@ public:
 	~Rectangle() {};
 	void Update(float dt);
 	void Draw();
+	size_t GetParticleCount ();
+	Particle* GetParticle (int particleIndex);
 
 private:
 	Particle *particle;

@@ -92,8 +92,8 @@ void Hero::Draw() {
 
 Particle* Hero::GetParticle(int particleIndex)
 {
-	std::cout << "particle index " << particleIndex << std::endl;
-	std::cout << particles[particleIndex]->pos.x << std::endl;
+//	std::cout << "particle index " << particleIndex << std::endl;
+//	std::cout << particles[particleIndex]->pos.x << std::endl;
 	return particles[particleIndex];
 }
 

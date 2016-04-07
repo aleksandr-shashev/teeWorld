@@ -1,4 +1,4 @@
-#include <iostream>
+//#include <iostream>
 #include "SFML\Graphics.hpp"
 #include "GameSystem.h"
 #include "Hero.h"
@@ -11,14 +11,14 @@ int main ()
 	GameSystem sys(&window);
 
 	Particle* particle = new Particle(Vector2f(200.0f, 200.0f));
-	Rectangle* first = new Rectangle(&sys, particle, 0.0f, Vector2f(50.0f, 50.0f));
+	Rectangle* first = new Rectangle(&sys, particle, 0.0f, Vector2f(200.0f, 200.0f));
 	sys.AddObject (first, RECTANGLE);
 	
 	Hero* second = new Hero(&sys);
-	int count = 20;
+	int count = 4;//20;
 	float pi = 3.1415926f;
-	Vector2f circleCenter = Vector2f(500.0f, 500.0f);
-	float circleRadius = 50;
+	Vector2f circleCenter = Vector2f(550.0f, 550.0f);
+	float circleRadius = 200;
 	for (int i = 0; i < count; i++) {
 		float ang = float(i) / count * (2.0f * pi);
 		Vector2f pos = Vector2f(cosf(ang), sinf(ang)) * circleRadius + circleCenter;

@@ -13,6 +13,8 @@ class Object
 public:
 	virtual void Update(float dt) = 0;
 	virtual void Draw() = 0;
+	virtual size_t GetParticleCount () = 0;
+	virtual Particle* GetParticle (int particleIndex) = 0;
 };
 
 
