@@ -4,12 +4,14 @@
 #include "Particle.h"
 #include <string>
 #include <map>
+#include <math.h>
 
 class Sprite {
 public:
 	Sprite() {};
 	Sprite(std::string filename);
 	void Draw(sf::RenderWindow *wnd, Particle *particle, float ang, Vector2f size);
+	void Draw(sf::RenderWindow *wnd, Vector2f pos, float ang, Vector2f size);
 	void Draw(sf::RenderWindow *wnd, std::vector<Particle*> particles);
 
 private:

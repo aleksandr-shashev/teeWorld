@@ -1,5 +1,4 @@
 #include "Sprite.h"
-#include <math.h>
 
 std::map<std::string, sf::Texture*> Sprite::textures;
 
@@ -18,16 +17,47 @@ void Sprite::Draw(sf::RenderWindow *wnd, Particle *particle, float ang, Vector2f
 	Vector2f xVector = Vector2f(cosf(ang), sinf(ang));
 	Vector2f yVector = xVector.GetPerp();
 
-	vertexPos = particle->pos - xVector * size.x - yVector * size.y;
+	vertexPos = particle->pos - xVector * size.x * 0.5f - yVector * size.y * 0.5f;
 	vertices[0] = sf::Vector2f(vertexPos.x, vertexPos.y);
 
-	vertexPos = particle->pos + xVector * size.x - yVector * size.y;
+	vertexPos = particle->pos + xVector * size.x * 0.5f - yVector * size.y * 0.5f;
 	vertices[1] = sf::Vector2f(vertexPos.x, vertexPos.y);
 
-	vertexPos = particle->pos + xVector * size.x + yVector * size.y;
+	vertexPos = particle->pos + xVector * size.x * 0.5f + yVector * size.y * 0.5f;
 	vertices[2] = sf::Vector2f(vertexPos.x, vertexPos.y);
 
-	vertexPos = particle->pos - xVector * size.x + yVector * size.y;
+	vertexPos = particle->pos - xVector * size.x * 0.5f + yVector * size.y * 0.5f;
+	vertices[3] = sf::Vector2f(vertexPos.x, vertexPos.y);
+
+	vertices[0].texCoords = sf::Vector2f(0.0f, 0.0f);
+	vertices[1].texCoords = sf::Vector2f((float)tex->getSize().x, 0.0f);
+	vertices[2].texCoords = sf::Vector2f((float)tex->getSize().x, (float)tex->getSize().y);
+	vertices[3].texCoords = sf::Vector2f(0.0f, (float)tex->getSize().y);
+
+	for (int i = 0; i < 4; i++) {
+		vertices[i].color = sf::Color::White;
+	}
+
+	(*wnd).draw(vertices, 4, sf::Quads, tex);
+}
+
+void Sprite::Draw(sf::RenderWindow *wnd, Vector2f pos, float ang, Vector2f size) {
+	sf::Vertex vertices[4];
+	Vector2f vertexPos;
+
+	Vector2f xVector = Vector2f(cosf(ang), sinf(ang));
+	Vector2f yVector = xVector.GetPerp();
+
+	vertexPos = pos - xVector * size.x * 0.5f - yVector * size.y * 0.5f;
+	vertices[0] = sf::Vector2f(vertexPos.x, vertexPos.y);
+
+	vertexPos = pos + xVector * size.x * 0.5f - yVector * size.y * 0.5f;
+	vertices[1] = sf::Vector2f(vertexPos.x, vertexPos.y);
+
+	vertexPos = pos + xVector * size.x * 0.5f + yVector * size.y * 0.5f;
+	vertices[2] = sf::Vector2f(vertexPos.x, vertexPos.y);
+
+	vertexPos = pos - xVector * size.x * 0.5f + yVector * size.y * 0.5f;
 	vertices[3] = sf::Vector2f(vertexPos.x, vertexPos.y);
 
 	vertices[0].texCoords = sf::Vector2f(0.0f, 0.0f);

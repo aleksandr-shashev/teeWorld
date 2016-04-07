@@ -10,15 +10,20 @@ int main ()
 
 	GameSystem sys(&window);
 
-	Particle* particle = new Particle(Vector2f(200.0f, 200.0f));
-	Rectangle* first = new Rectangle(&sys, particle, 0.0f, Vector2f(200.0f, 200.0f));
-	sys.AddObject (first, RECTANGLE);
+	Rectangle* first = new Rectangle(&sys, Vector2f(500.0f, 975.0f), 0.0f, Vector2f(1000.0f, 50.0f));
+	sys.AddObject(first, RECTANGLE);
+	first = new Rectangle(&sys, Vector2f(25.0f, 500.0f), 0.0f, Vector2f(50.0f, 500.0f));
+	sys.AddObject(first, RECTANGLE);
+	first = new Rectangle(&sys, Vector2f(800.0f, 200.0f), 0.0f, Vector2f(200.0f, 50.0f));
+	sys.AddObject(first, RECTANGLE);
+	first = new Rectangle(&sys, Vector2f(500.0f, 400.0f), -0.4f, Vector2f(200.0f, 50.0f));
+	sys.AddObject(first, RECTANGLE);
 	
 	Hero* second = new Hero(&sys);
-	int count = 4;//20;
+	int count = 20;
 	float pi = 3.1415926f;
 	Vector2f circleCenter = Vector2f(550.0f, 550.0f);
-	float circleRadius = 200;
+	float circleRadius = 25;
 	for (int i = 0; i < count; i++) {
 		float ang = float(i) / count * (2.0f * pi);
 		Vector2f pos = Vector2f(cosf(ang), sinf(ang)) * circleRadius + circleCenter;
@@ -32,7 +37,7 @@ int main ()
 	for (int i = 0; i < count; i++) {
 		tmp.push_back(second->GetParticle(i));
 	}
-	second->AddVolumeLink(tmp);
+	second->AddVolumeLink(tmp, 0.2f, 0.1f);
 	sys.AddObject(second, HERO);
 	
 	while (window.isOpen ())

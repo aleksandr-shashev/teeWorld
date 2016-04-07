@@ -3,14 +3,14 @@
 #include "vector2f.h"
 #include <vector>
 #include <math.h>
-//#include <iostream>
 
 class Particle
 {
 public:
 	Particle() {}
-	Particle(Vector2f pos) {
+	Particle(Vector2f pos, float radius = 5.0f) {
 		this->pos = pos;
+		this->radius = radius;
 	}
 	void Integrate (float dt) {
 		Vector2f currPos = pos;
@@ -59,8 +59,8 @@ public:
 	{ }
 
 	VolumeLink (std::vector<Particle*> particles, 
-				float initialPressure = 0.1f, 
-				float atmosphericPressure = 0.1f) :
+				float initialPressure, 
+				float atmosphericPressure) :
 		particlesTop (particles),
 		initialPressure (initialPressure),
 		initialVolume (calcVolume ()),

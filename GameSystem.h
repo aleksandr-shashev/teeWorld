@@ -15,6 +15,7 @@ public:
 	virtual void Draw() = 0;
 	virtual size_t GetParticleCount () = 0;
 	virtual Particle* GetParticle (int particleIndex) = 0;
+	virtual void Push(Vector2f step) {};
 };
 
 
@@ -28,6 +29,7 @@ public:
 	Object *AddObject (Object *candidate, ObjectTypes type);
 	Object *GetObject (ObjectTypes type, int pos);
 	sf::RenderWindow *GetWindow();
+	bool GameSystem::CanJump(int hero);
 
 private:
 	std::vector <std::vector <Object*> > objectArrays;

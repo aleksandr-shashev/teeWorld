@@ -3,6 +3,7 @@
 Hero::Hero(GameSystem *owner) {
 	this->owner = owner;
 	sprite = Sprite("data/smile.png");
+	sprite2 = Sprite("data/ball.png");
 }
 
 Particle* Hero::AddParticle(Vector2f pos, float radius)
@@ -10,16 +11,16 @@ Particle* Hero::AddParticle(Vector2f pos, float radius)
 	Particle* newbie = new Particle;
 	newbie->pos = pos;
 	newbie->prevPos = newbie->pos;
-	newbie->acceleration = Vector2f(0.0f, 10.0f);
+	newbie->acceleration = Vector2f(0.0f, 30.0f);
 	newbie->radius = radius;
 	particles.push_back(newbie);
 
 	return newbie;
 }
 
-VolumeLink* Hero::AddVolumeLink(std::vector<Particle*> particles)
+VolumeLink* Hero::AddVolumeLink(std::vector<Particle*> particles, float initialPressure, float atmosphericPressure)
 {
-	volumeLink = new VolumeLink(particles);
+	volumeLink = new VolumeLink(particles, initialPressure, atmosphericPressure);
 	return volumeLink;
 }
 
@@ -67,27 +68,19 @@ void Hero::Update(float dt)
 	}
 
 	volumeLink->Solve();
+}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-		for (int i = 0; i < particles.size(); i++)
-			particles[i]->pos = particles[i]->pos + Vector2f(step, 0.0f);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-		for (int i = 0; i < particles.size(); i++)
-			particles[i]->pos = particles[i]->pos + Vector2f(-step, 0.0f);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-		for (int i = 0; i < particles.size(); i++)
-			particles[i]->pos = particles[i]->pos + Vector2f(0.0f, -step);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-		for (int i = 0; i < particles.size(); i++)
-			particles[i]->pos = particles[i]->pos + Vector2f(0.0f, step);
-	}
+void Hero::Push(Vector2f step) {
+	for (int i = 0; i < particles.size(); i++)
+		if((particles[i]->pos - particles[i]->prevPos).Length() < 1.0f)
+			particles[i]->pos = particles[i]->pos + step;
 }
 
 void Hero::Draw() {
 	sprite.Draw(owner->GetWindow(), particles);
+	for (int i = 0; i < particles.size(); i++) {
+		sprite2.Draw(owner->GetWindow(), particles[i], 0.0f, Vector2f(particles[i]->radius * 2.0f, particles[i]->radius * 2.0f));
+	}
 }
 
 Particle* Hero::GetParticle(int particleIndex)

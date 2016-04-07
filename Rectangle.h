@@ -5,7 +5,7 @@ class Rectangle : public Object
 {
 public:
 	Rectangle() {};
-	Rectangle(GameSystem *owner, Particle* particle, float ang, Vector2f size);
+	Rectangle(GameSystem *owner, Vector2f centre, float ang, Vector2f size);
 	~Rectangle() {};
 	void Update(float dt);
 	void Draw();
@@ -13,9 +13,11 @@ public:
 	Particle* GetParticle (int particleIndex);
 
 private:
-	Particle *particle;
+	std::vector<Particle *> particles;
 	float ang;
+	Vector2f centre;
 	Vector2f size;
 	Sprite sprite;
+	Sprite sprite2;
 	GameSystem *owner;
 };
