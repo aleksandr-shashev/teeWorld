@@ -40,6 +40,18 @@ public:
 		return Vector2f((-1)*y / Length(), x / Length());
 	}
 
+	/*Vector2f GetPerpToLine (Vector2f linePoint1, Vector2f linePoint2, Vector2f point)
+	{
+		Vector2f rib = linePoint2 - linePoint1;
+
+		Vector2f delta = -rib.GetPerp ();
+		Vector2f vecToPos = point - linePoint1;
+		float deltaScale = abs (-vecToPos ^ rib) / rib.Length ();
+		delta = delta * (deltaScale);
+
+		return delta;
+	}*/
+
 	float x, y;
 };
 
@@ -48,6 +60,8 @@ Vector2f Add(Vector2f v0, Vector2f v1);
 Vector2f operator +(Vector2f v0, Vector2f v1);
 
 Vector2f operator - (Vector2f v0, Vector2f v1);
+
+Vector2f operator - (Vector2f v0);
 
 Vector2f operator * (Vector2f v0, float param);
 

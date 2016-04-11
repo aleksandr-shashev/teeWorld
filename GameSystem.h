@@ -16,6 +16,8 @@ public:
 	virtual size_t GetParticleCount () = 0;
 	virtual Particle* GetParticle (int particleIndex) = 0;
 	virtual void Push(Vector2f step) {};
+	virtual Vector2f GetMinPerp (Particle* point) { return Vector2f (0.0f, 0.0f); }
+	virtual bool IsInside (Vector2f pos) { return false; }
 };
 
 

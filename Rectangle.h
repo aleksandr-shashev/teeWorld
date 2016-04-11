@@ -11,6 +11,8 @@ public:
 	void Draw();
 	size_t GetParticleCount ();
 	Particle* GetParticle (int particleIndex);
+	Vector2f GetMinPerp (Particle* point);
+	bool IsInside (Vector2f pos);
 
 private:
 	std::vector<Particle *> particles;

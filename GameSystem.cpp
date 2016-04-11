@@ -41,18 +41,18 @@ void GameSystem::Update(float dt) {
 	{
 		for (int heroCounter = 0; heroCounter < objectArrays[HERO].size(); heroCounter++)
 		{
-			//interactions between objects
-			for (size_t j = 0; j < objectArrays[HERO][heroCounter]->GetParticleCount(); j++) {
-				for (size_t i = 0; i < objectArrays[RECTANGLE][rectCounter]->GetParticleCount(); i++) {
-						Vector2f delta = objectArrays[HERO][heroCounter]->GetParticle(j)->pos -
-										 objectArrays[RECTANGLE][rectCounter]->GetParticle(i)->pos;
-						float del = objectArrays[HERO][heroCounter]->GetParticle(j)->radius +
-									objectArrays[RECTANGLE][rectCounter]->GetParticle(i)->radius - delta.Length();
-						if (del > 0) {
-							objectArrays[HERO][heroCounter]->GetParticle(j)->pos = objectArrays[HERO][heroCounter]->GetParticle(j)->pos + delta.GetNorm() * del * 0.5f;
-							objectArrays[HERO][heroCounter]->GetParticle(j)->prevPos = objectArrays[HERO][heroCounter]->GetParticle(j)->pos;
-						}
-					}
+			for (int heroParticleCounter = 0;
+				heroParticleCounter < objectArrays [HERO] [heroCounter]->GetParticleCount ();
+				heroParticleCounter++)
+			{
+				Particle* curHeroParticle =
+					objectArrays [HERO] [heroCounter]->GetParticle (heroParticleCounter);
+				
+				if (!(objectArrays [RECTANGLE] [rectCounter]->IsInside (curHeroParticle->pos)))
+					continue;
+					curHeroParticle->prevPos = curHeroParticle->pos;
+					curHeroParticle->pos = curHeroParticle->pos +
+						objectArrays [RECTANGLE] [rectCounter]->GetMinPerp (curHeroParticle);
 			}
 		}
 	}
@@ -84,13 +84,21 @@ bool GameSystem::CanJump(int hero) {
 	{
 		for (size_t j = 0; j < objectArrays[HERO][hero]->GetParticleCount(); j++) {
 			for (size_t i = 0; i < objectArrays[RECTANGLE][rectCounter]->GetParticleCount(); i++) {
-				Vector2f delta = objectArrays[HERO][hero]->GetParticle(j)->pos -
-					objectArrays[RECTANGLE][rectCounter]->GetParticle(i)->pos;
-				if (delta.Length() < 20.f) {
-					return 1;
-				}
+				Particle* heroParticle = objectArrays [HERO] [hero]->GetParticle (j);
+				Vector2f delta = objectArrays[RECTANGLE][rectCounter]->GetMinPerp (heroParticle);
+
+				Particle* curRectParticle = 
+					objectArrays [RECTANGLE] [rectCounter]->GetParticle (i);
+				size_t rectParticleCout = objectArrays [RECTANGLE] [rectCounter]->GetParticleCount ();
+				Particle* nextRectParticle = 
+					objectArrays [RECTANGLE] [rectCounter]->GetParticle ((i + 1) % rectParticleCout);
+
+				if ((-1e-2f < delta.Length () && delta.Length () < 1e-2f) &&
+					(curRectParticle->pos.Length () <= heroParticle->pos.Length () &&
+					 heroParticle->pos.Length () <= nextRectParticle->pos.Length ()))
+					return true;
 			}
 		}
 	}
-	return 0;
+	return false;
 }
