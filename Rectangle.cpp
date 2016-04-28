@@ -6,6 +6,8 @@ Rectangle::Rectangle(GameSystem *owner, Vector2f centre, float ang, Vector2f siz
 	this->ang = ang;
 	this->centre = centre;
 	this->size = size;
+	this->exist = true;
+
 	sprite = Sprite("data/wall.jpg");
 	sprite2 = Sprite("data/ball.png");
 

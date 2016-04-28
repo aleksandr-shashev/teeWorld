@@ -1,97 +1,102 @@
+#pragma once
+
 #include "GameSystem.h"
+
 
 GameSystem::GameSystem (sf::RenderWindow *wnd) {
 	this->wnd = wnd;
-	for (int i = 0; i < END; i++) {
-		objectArrays.push_back(std::vector <Object *>());
-	}
 }
 
-Object* GameSystem::AddObject (Object* candidate, ObjectTypes type)
+
+void GameSystem::Update(float dt) 
 {
-	objectArrays[type].push_back(candidate);
-	return objectArrays[type].back();
-}
-
-void GameSystem::Update(float dt) {
-	for (unsigned int type = 0; type < END; type++) 
+	for (unsigned int object = 0; object < objectsArray.size(); object++) 
 	{
-		for (unsigned int object = 0; object < objectArrays[type].size(); object++) 
-		{
-			objectArrays[type][object]->Update(dt);
-		}
+		objectsArray[object]->Update(dt);
 	}
+
+	for (int i = 0; i < objectsArray.size ();)
+	{
+		if (!objectsArray [i]->Exist ())
+		{
+			objectsArray [i] = objectsArray.back ();
+			objectsArray.pop_back ();
+		}
+		else
+			i++;
+	}
+
+	GarbageCollector (heroesArray);
+	GarbageCollector (rectanglesArray);
+
+
 	float step = 0.01f;
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-		(objectArrays[HERO][0])->Push(Vector2f(step, 0.0f));
+		(heroesArray[0])->Push(Vector2f(step, 0.0f));
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-		(objectArrays[HERO][0])->Push(Vector2f(-step, 0.0f));
+		(heroesArray[0])->Push(Vector2f(-step, 0.0f));
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 		if (CanJump(0)) {
-			(objectArrays[HERO][0])->Push(Vector2f(0.0f, -0.5f));
+			(heroesArray[0])->Push(Vector2f(0.0f, -0.5f));
 		}
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-		(objectArrays[HERO][0])->Push(Vector2f(0.0f, step));
+		(heroesArray[0])->Push(Vector2f(0.0f, step));
 	}
 
-	for (int rectCounter = 0; rectCounter < objectArrays[RECTANGLE].size(); rectCounter++)
+	for (int rectCounter = 0; rectCounter < rectanglesArray.size(); rectCounter++)
 	{
-		for (int heroCounter = 0; heroCounter < objectArrays[HERO].size(); heroCounter++)
+		for (int heroCounter = 0; heroCounter < heroesArray.size(); heroCounter++)
 		{
 			for (int heroParticleCounter = 0;
-				heroParticleCounter < objectArrays [HERO] [heroCounter]->GetParticleCount ();
+				heroParticleCounter < heroesArray [heroCounter]->GetParticleCount ();
 				heroParticleCounter++)
 			{
 				Particle* curHeroParticle =
-					objectArrays [HERO] [heroCounter]->GetParticle (heroParticleCounter);
+					heroesArray [heroCounter]->GetParticle (heroParticleCounter);
 				
-				if (!(objectArrays [RECTANGLE] [rectCounter]->IsInside (curHeroParticle->pos)))
+				if (!(rectanglesArray [rectCounter]->IsInside (curHeroParticle->pos)))
 					continue;
-					curHeroParticle->prevPos = curHeroParticle->pos;
-					curHeroParticle->pos = curHeroParticle->pos +
-						objectArrays [RECTANGLE] [rectCounter]->GetMinPerp (curHeroParticle);
+				curHeroParticle->prevPos = curHeroParticle->pos;
+				curHeroParticle->pos = curHeroParticle->pos +
+						rectanglesArray [rectCounter]->GetMinPerp (curHeroParticle);
+				if (rectCounter != 0)
+					rectanglesArray [rectCounter]->Kill ();
 			}
 		}
 	}
-
-
 }
 
 void GameSystem::Draw() {
-	for (unsigned int type = 0; type < END; type++) {
-		for (unsigned int object = 0; object < objectArrays[type].size(); object++) {
-			objectArrays[type][object]->Draw();
-		}
+	for (unsigned int object = 0; object < objectsArray.size(); object++) {
+			objectsArray[object]->Draw();
 	}
 }
 
-Object* GameSystem::GetObject (ObjectTypes type, int pos)
-{
-	if (pos < objectArrays[type].size ())
-		return objectArrays[type][pos];
-	return NULL;
-}
 
 sf::RenderWindow *GameSystem::GetWindow() {
 	return wnd;
 }
 
-bool GameSystem::CanJump(int hero) {
-	for (int rectCounter = 0; rectCounter < objectArrays[RECTANGLE].size(); rectCounter++)
+bool GameSystem::CanJump(int hero) 
+{
+	for (int rectCounter = 0; rectCounter < rectanglesArray.size(); rectCounter++)
 	{
-		for (size_t j = 0; j < objectArrays[HERO][hero]->GetParticleCount(); j++) {
-			for (size_t i = 0; i < objectArrays[RECTANGLE][rectCounter]->GetParticleCount(); i++) {
-				Particle* heroParticle = objectArrays [HERO] [hero]->GetParticle (j);
-				Vector2f delta = objectArrays[RECTANGLE][rectCounter]->GetMinPerp (heroParticle);
+		for (int j = 0; j < heroesArray [hero]->GetParticleCount(); j++) 
+		{
+			for (int i = 0; i < rectanglesArray [rectCounter]->GetParticleCount(); i++) 
+			{
+				Particle* heroParticle = heroesArray [hero]->GetParticle (j);
+				Vector2f delta = rectanglesArray [rectCounter]->GetMinPerp (heroParticle);
 
 				Particle* curRectParticle = 
-					objectArrays [RECTANGLE] [rectCounter]->GetParticle (i);
-				size_t rectParticleCout = objectArrays [RECTANGLE] [rectCounter]->GetParticleCount ();
+					rectanglesArray [rectCounter]->GetParticle (i);
+				size_t rectParticleCout = rectanglesArray [rectCounter]->GetParticleCount ();
 				Particle* nextRectParticle = 
-					objectArrays [RECTANGLE] [rectCounter]->GetParticle ((i + 1) % rectParticleCout);
+					rectanglesArray [rectCounter]->GetParticle ((i + 1) % rectParticleCout);
 
 				if ((-1e-2f < delta.Length () && delta.Length () < 1e-2f) &&
 					(curRectParticle->pos.Length () <= heroParticle->pos.Length () &&
@@ -102,3 +107,4 @@ bool GameSystem::CanJump(int hero) {
 	}
 	return false;
 }
+

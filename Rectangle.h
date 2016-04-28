@@ -1,5 +1,9 @@
+#pragma once
+
 #include "GameSystem.h"
 #include "Sprite.h"
+
+class Object;
 
 class Rectangle : public Object
 {
@@ -9,6 +13,9 @@ public:
 	~Rectangle() {};
 	void Update(float dt);
 	void Draw();
+	bool Exist () { return exist; }
+	void Kill () { exist = false; }
+
 	size_t GetParticleCount ();
 	Particle* GetParticle (int particleIndex);
 	Vector2f GetMinPerp (Particle* point);
@@ -22,4 +29,5 @@ private:
 	Sprite sprite;
 	Sprite sprite2;
 	GameSystem *owner;
+	bool exist;
 };

@@ -1,8 +1,10 @@
 //#include <iostream>
 #include "SFML\Graphics.hpp"
 #include "GameSystem.h"
+
 #include "Hero.h"
-#include "Rectangle.h"
+#include "Rectangle.h"	
+
 
 int main ()
 {
@@ -11,13 +13,13 @@ int main ()
 	GameSystem sys(&window);
 
 	Rectangle* first = new Rectangle(&sys, Vector2f(500.0f, 975.0f), 0.0f, Vector2f(1000.0f, 50.0f));
-	sys.AddObject(first, RECTANGLE);
+	sys.AddObject (first, RECTANGLE);
 	first = new Rectangle(&sys, Vector2f(25.0f, 500.0f), 0.0f, Vector2f(50.0f, 500.0f));
-	sys.AddObject(first, RECTANGLE);		
+	sys.AddObject (first, RECTANGLE);
 	first = new Rectangle(&sys, Vector2f(800.0f, 200.0f), 0.0f, Vector2f(200.0f, 50.0f));
-	sys.AddObject(first, RECTANGLE);
+	sys.AddObject (first, RECTANGLE);
 	first = new Rectangle(&sys, Vector2f(500.0f, 400.0f), -0.4f, Vector2f(200.0f, 50.0f));
-	sys.AddObject(first, RECTANGLE);
+	sys.AddObject (first, RECTANGLE);
 	
 	Hero* second = new Hero(&sys);
 	int count = 20;
@@ -38,7 +40,7 @@ int main ()
 		tmp.push_back(second->GetParticle(i));
 	}
 	second->AddVolumeLink(tmp, 0.2f, 0.1f);
-	sys.AddObject(second, HERO);
+	sys.AddObject (second, HERO);
 	
 	while (window.isOpen ())
 	{

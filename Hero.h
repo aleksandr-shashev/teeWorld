@@ -1,6 +1,10 @@
+#pragma once
+
 #include "GameSystem.h"
 #include "Sprite.h"
 #include "SFML\Graphics.hpp"
+
+class Object;
 
 class Hero : public Object
 {
@@ -13,6 +17,7 @@ public:
 	VolumeLink* AddVolumeLink(std::vector<Particle*> particles, float initialPressure = 0.1f, float atmosphericPressure = 0.1f);
 	void Update(float dt);
 	void Draw();
+	bool Exist () { return true; }
 
 	void Push(Vector2f step);
 	Particle* GetParticle(int particleIndex);
