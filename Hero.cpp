@@ -4,6 +4,7 @@ Hero::Hero(GameSystem *owner) {
 	this->owner = owner;
 	sprite = Sprite("data/smile.png");
 	sprite2 = Sprite("data/ball.png");
+	exist = true;
 }
 
 Particle* Hero::AddParticle(Vector2f pos, float radius)

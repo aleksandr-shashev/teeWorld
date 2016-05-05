@@ -4,6 +4,8 @@
 
 #include "Hero.h"
 #include "Rectangle.h"	
+#include "Spike.h"
+#include "Background.h"
 
 
 int main ()
@@ -12,17 +14,26 @@ int main ()
 
 	GameSystem sys(&window);
 
+	Background* ground = new Background (&sys,
+										 Vector2f (1000.0f / 2.0f, 1000.0f / 2.0f),
+										 0.0f,
+										 Vector2f (1000.0f, 1000.0f));
+	sys.AddObject (ground);
+
 	Rectangle* first = new Rectangle(&sys, Vector2f(500.0f, 975.0f), 0.0f, Vector2f(1000.0f, 50.0f));
-	sys.AddObject (first, RECTANGLE);
+	sys.AddObject (first);
 	first = new Rectangle(&sys, Vector2f(25.0f, 500.0f), 0.0f, Vector2f(50.0f, 500.0f));
-	sys.AddObject (first, RECTANGLE);
+	sys.AddObject (first);
 	first = new Rectangle(&sys, Vector2f(800.0f, 200.0f), 0.0f, Vector2f(200.0f, 50.0f));
-	sys.AddObject (first, RECTANGLE);
+	sys.AddObject (first);
 	first = new Rectangle(&sys, Vector2f(500.0f, 400.0f), -0.4f, Vector2f(200.0f, 50.0f));
-	sys.AddObject (first, RECTANGLE);
+	sys.AddObject (first);
 	
+	Spike* spike = new Spike (&sys, Vector2f (100.0f, 925.0f), 0.0f, Vector2f (50.0f, 50.0f));
+	sys.AddObject (spike);
+
 	Hero* second = new Hero(&sys);
-	int count = 20;
+	int count = 10;
 	float pi = 3.1415926f;
 	Vector2f circleCenter = Vector2f(900.0f, 900.0f);
 	float circleRadius = 25;
@@ -40,7 +51,7 @@ int main ()
 		tmp.push_back(second->GetParticle(i));
 	}
 	second->AddVolumeLink(tmp, 0.2f, 0.1f);
-	sys.AddObject (second, HERO);
+	sys.AddObject (second);
 	
 	while (window.isOpen ())
 	{

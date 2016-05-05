@@ -17,7 +17,8 @@ public:
 	VolumeLink* AddVolumeLink(std::vector<Particle*> particles, float initialPressure = 0.1f, float atmosphericPressure = 0.1f);
 	void Update(float dt);
 	void Draw();
-	bool Exist () { return true; }
+	bool Exist () { return exist; }
+	void Kill () { exist = false; }
 
 	void Push(Vector2f step);
 	Particle* GetParticle(int particleIndex);
@@ -31,4 +32,5 @@ private:
 	Sprite sprite;
 	Sprite sprite2;
 	GameSystem *owner;
+	bool exist;
 };

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "GameSystem.h"
+#include "Rectangle.h"
+#include "Hero.h"
+#include "Spike.h"
 
 
 GameSystem::GameSystem (sf::RenderWindow *wnd) {
@@ -30,44 +33,35 @@ void GameSystem::Update(float dt)
 	GarbageCollector (rectanglesArray);
 
 
-	float step = 0.01f;
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-		(heroesArray[0])->Push(Vector2f(step, 0.0f));
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-		(heroesArray[0])->Push(Vector2f(-step, 0.0f));
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-		if (CanJump(0)) {
-			(heroesArray[0])->Push(Vector2f(0.0f, -0.5f));
-		}
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-		(heroesArray[0])->Push(Vector2f(0.0f, step));
-	}
+	float step = 0.1f;
 
-	for (int rectCounter = 0; rectCounter < rectanglesArray.size(); rectCounter++)
+	if (heroesArray.size ())
 	{
-		for (int heroCounter = 0; heroCounter < heroesArray.size(); heroCounter++)
+		if (sf::Keyboard::isKeyPressed (sf::Keyboard::D))
 		{
-			for (int heroParticleCounter = 0;
-				heroParticleCounter < heroesArray [heroCounter]->GetParticleCount ();
-				heroParticleCounter++)
+			(heroesArray [0])->Push (Vector2f (step, 0.0f));
+		}
+		if (sf::Keyboard::isKeyPressed (sf::Keyboard::A))
+		{
+			(heroesArray [0])->Push (Vector2f (-step, 0.0f));
+		}
+		if (sf::Keyboard::isKeyPressed (sf::Keyboard::W))
+		{
+			if (CanJump (0))
 			{
-				Particle* curHeroParticle =
-					heroesArray [heroCounter]->GetParticle (heroParticleCounter);
-				
-				if (!(rectanglesArray [rectCounter]->IsInside (curHeroParticle->pos)))
-					continue;
-				curHeroParticle->prevPos = curHeroParticle->pos;
-				curHeroParticle->pos = curHeroParticle->pos +
-						rectanglesArray [rectCounter]->GetMinPerp (curHeroParticle);
-				if (rectCounter != 0)
-					rectanglesArray [rectCounter]->Kill ();
+				(heroesArray [0])->Push (Vector2f (0.0f, -0.5f));
 			}
 		}
+		if (sf::Keyboard::isKeyPressed (sf::Keyboard::S))
+		{
+			(heroesArray [0])->Push (Vector2f (0.0f, step));
+		}
 	}
+
+	HandleRectangles ();
+	HandleSpikes ();
+
 }
 
 void GameSystem::Draw() {
@@ -108,3 +102,53 @@ bool GameSystem::CanJump(int hero)
 	return false;
 }
 
+
+void GameSystem::HandleRectangles ()
+{
+	for (int rectCounter = 0; rectCounter < rectanglesArray.size (); rectCounter++)
+	{
+		for (int heroCounter = 0; heroCounter < heroesArray.size (); heroCounter++)
+		{
+			for (int heroParticleCounter = 0;
+			heroParticleCounter < heroesArray [heroCounter]->GetParticleCount ();
+				heroParticleCounter++)
+			{
+				Particle* curHeroParticle =
+					heroesArray [heroCounter]->GetParticle (heroParticleCounter);
+
+				if (!(rectanglesArray [rectCounter]->IsInside (curHeroParticle->pos)))
+					continue;
+				curHeroParticle->prevPos = curHeroParticle->pos;
+				curHeroParticle->pos = curHeroParticle->pos +
+					rectanglesArray [rectCounter]->GetMinPerp (curHeroParticle);
+				if (rectCounter != 0)
+					rectanglesArray [rectCounter]->Kill ();
+			}
+		}
+	}
+}
+void GameSystem::HandleSpikes ()
+{
+	for (int spikeCounter = 0; spikeCounter < spikesArray.size(); spikeCounter++)
+	{
+		for (int heroCounter = 0; heroCounter < heroesArray.size(); heroCounter++)
+		{
+			for (int heroParticleCounter = 0;
+				heroParticleCounter < heroesArray [heroCounter]->GetParticleCount ();
+				heroParticleCounter++)
+			{
+				Particle* curHeroParticle =
+					heroesArray [heroCounter]->GetParticle (heroParticleCounter);
+				
+				if (!(spikesArray [spikeCounter]->IsInside (curHeroParticle->pos)))
+					continue;
+				curHeroParticle->prevPos = curHeroParticle->pos;
+				curHeroParticle->pos = curHeroParticle->pos +
+						spikesArray [spikeCounter]->GetMinPerp (curHeroParticle);
+				heroesArray [heroCounter]->Kill ();
+				break;
+
+			}
+		}
+	}
+}

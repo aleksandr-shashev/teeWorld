@@ -3,13 +3,16 @@
 #include "GameSystem.h"
 #include "Sprite.h"
 
-class Object;
-
 class Rectangle : public Object
 {
 public:
 	Rectangle() {};
-	Rectangle(GameSystem *owner, Vector2f centre, float ang, Vector2f size);
+	Rectangle (GameSystem *owner, 
+			   Vector2f centre, 
+			   float ang, 
+			   Vector2f size, 
+			   std::string spriteFileName = std::string ("data/wall.jpg"));
+	
 	~Rectangle() {};
 	void Update(float dt);
 	void Draw();
@@ -21,7 +24,7 @@ public:
 	Vector2f GetMinPerp (Particle* point);
 	bool IsInside (Vector2f pos);
 
-private:
+protected:
 	std::vector<Particle *> particles;
 	float ang;
 	Vector2f centre;

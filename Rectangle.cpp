@@ -1,14 +1,14 @@
 #include "Rectangle.h"
 #include <iostream>
 
-Rectangle::Rectangle(GameSystem *owner, Vector2f centre, float ang, Vector2f size) {
+Rectangle::Rectangle(GameSystem *owner, Vector2f centre, float ang, Vector2f size, std::string spriteFileName) {
 	this->owner = owner;
 	this->ang = ang;
 	this->centre = centre;
 	this->size = size;
 	this->exist = true;
 
-	sprite = Sprite("data/wall.jpg");
+	sprite = Sprite(spriteFileName);
 	sprite2 = Sprite("data/ball.png");
 
 	Vector2f points[4];
@@ -84,7 +84,7 @@ Vector2f Rectangle::GetMinPerp (Particle* point)
 
 bool Rectangle::IsInside (Vector2f pos)
 {
-	int sign = 0.0f;
+	float sign = 0.0f;
 
 	for (int i = 0; i < particles.size (); i++)
 	{

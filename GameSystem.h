@@ -10,6 +10,8 @@
 
 class Hero;
 class Rectangle;
+class Spike;
+class Background;
 
 class Object
 {
@@ -35,49 +37,82 @@ public:
 	void Draw();
 
 	template <class Data_T> 
-	Object *AddObject (Data_T *candidate, ObjectTypes type)
+	Object *AddObject (Data_T *candidate)
+	{
+	}
+	
+	template <>
+	Object *AddObject (Hero *candidate)
 	{
 		objectsArray.push_back ((Object*)candidate);
 
-		switch (type)
-		{
-			case HERO:
-			{
-				heroesArray.push_back ((Hero*)candidate);
-				break;
-			}
-			case RECTANGLE:
-			{
-				rectanglesArray.push_back ((Rectangle*)candidate);
-				break;
-			}
-			default: break;
-		}
-
+		heroesArray.push_back (candidate);
 		return objectsArray.back ();
 	}
-	
-	template <class Data_T> 
-	Data_T *GetObject (ObjectTypes type, int pos)
+
+	template <>
+	Object *AddObject (Rectangle *candidate)
 	{
-		switch (type)
-		{
-			case HERO:
-			{
-				if (heroesArray.size () > pos)
-					return heroesArray [pos];
-				break;
-			}
-			case RECTANGLE:
-			{
-				if (rectanglesArray.size () > pos)
-					return rectanglesArray [pos];
-				break;
-			}
-			default: break;
-		}
+		objectsArray.push_back ((Object*)candidate);
+
+		rectanglesArray.push_back (candidate);
+		return objectsArray.back ();
+	}
+
+	template <>
+	Object *AddObject (Spike *candidate)
+	{
+		objectsArray.push_back ((Object*)candidate);
+
+		spikesArray.push_back (candidate);
+		return objectsArray.back ();
+	}
+	template <>
+	Object *AddObject (Background* candidate)
+	{
+		objectsArray.push_back ((Object*)candidate);
+		backgroundsArray.push_back (candidate);
+		return objectsArray.back ();
+	}
+
+
+	template <class Data_T> 
+	Data_T *GetObject (int pos)
+	{
+	}
+
+	template <>
+	Hero *GetObject (int pos)
+	{
+		if (heroesArray.size () > pos)
+			return heroesArray [pos];
 		return NULL;
 	}
+
+	template <>
+	Rectangle *GetObject (int pos)
+	{
+		if (rectanglesArray.size () > pos)
+			return rectanglesArray [pos];
+		return NULL;
+	}
+	
+	template <>
+	Spike *GetObject (int pos)
+	{
+		if (spikesArray.size () > pos)
+			return spikesArray [pos];
+		return NULL;
+	}
+
+	template <>
+	Background *GetObject (int pos)
+	{
+		if (backgroundsArray.size () > pos)
+			return backgroundsArray [pos];
+		return NULL;
+	}
+
 	
 	sf::RenderWindow *GetWindow();
 	bool GameSystem::CanJump(int hero);
@@ -86,6 +121,8 @@ private:
 	std::vector <Object *> objectsArray;
 	std::vector <Hero *> heroesArray;
 	std::vector <Rectangle *> rectanglesArray;
+	std::vector <Spike *> spikesArray;
+	std::vector <Background *> backgroundsArray;
 	//Particle 
 	sf::RenderWindow *wnd;
 
@@ -94,17 +131,23 @@ private:
 	{
 		for (int i = 0; i < array.size ();)
 		{
-			if (!array [i]->Exist ())
+			if (array [i])
 			{
-				delete array [i];
-				array [i] = array.back ();
-				array.pop_back ();
+				if (!array [i]->Exist ())
+				{
+					delete array [i];
+					array [i] = array.back ();
+					array.pop_back ();
+				}
+				else
+					i++;
 			}
 			else
-				i++;
+				break;
 		}
 	}
-};
 
-#include "Hero.h"
-#include "Rectangle.h"	
+	void HandleRectangles ();
+	void HandleSpikes ();
+
+};
