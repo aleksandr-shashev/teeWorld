@@ -116,6 +116,7 @@ public:
 	
 	sf::RenderWindow *GetWindow();
 	bool GameSystem::CanJump(int hero);
+	void GameSystem::CreateHero();
 
 private:
 	std::vector <Object *> objectsArray;

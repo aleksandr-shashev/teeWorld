@@ -8,6 +8,7 @@
 #include "Background.h"
 
 
+
 int main ()
 {
 	sf::RenderWindow window(sf::VideoMode(1000, 1000), "Let's play!");
@@ -32,26 +33,7 @@ int main ()
 	Spike* spike = new Spike (&sys, Vector2f (100.0f, 925.0f), 0.0f, Vector2f (50.0f, 50.0f));
 	sys.AddObject (spike);
 
-	Hero* second = new Hero(&sys);
-	int count = 10;
-	float pi = 3.1415926f;
-	Vector2f circleCenter = Vector2f(900.0f, 900.0f);
-	float circleRadius = 25;
-	for (int i = 0; i < count; i++) {
-		float ang = float(i) / count * (2.0f * pi);
-		Vector2f pos = Vector2f(cosf(ang), sinf(ang)) * circleRadius + circleCenter;
-		second->AddParticle(pos, 5.0f);
-	}
-	for (int i = 0; i < count; i++) {
-		second->AddLink(second->GetParticle(i), second->GetParticle((i + 1) % count), 0.05f, 1.0f);
-	}
-
-	std::vector<Particle*> tmp;
-	for (int i = 0; i < count; i++) {
-		tmp.push_back(second->GetParticle(i));
-	}
-	second->AddVolumeLink(tmp, 0.2f, 0.1f);
-	sys.AddObject (second);
+	sys.CreateHero();
 	
 	while (window.isOpen ())
 	{

@@ -13,6 +13,11 @@ GameSystem::GameSystem (sf::RenderWindow *wnd) {
 
 void GameSystem::Update(float dt) 
 {
+	
+	if (heroesArray.size() == 0) {
+		CreateHero();
+	}
+
 	for (unsigned int object = 0; object < objectsArray.size(); object++) 
 	{
 		objectsArray[object]->Update(dt);
@@ -32,7 +37,8 @@ void GameSystem::Update(float dt)
 	GarbageCollector (heroesArray);
 	GarbageCollector (rectanglesArray);
 
-
+	HandleRectangles();
+	HandleSpikes();
 
 	float step = 0.1f;
 
@@ -50,7 +56,7 @@ void GameSystem::Update(float dt)
 		{
 			if (CanJump (0))
 			{
-				(heroesArray [0])->Push (Vector2f (0.0f, -0.5f));
+				(heroesArray [0])->Push (Vector2f (0.0f, -1.5f));
 			}
 		}
 		if (sf::Keyboard::isKeyPressed (sf::Keyboard::S))
@@ -59,8 +65,7 @@ void GameSystem::Update(float dt)
 		}
 	}
 
-	HandleRectangles ();
-	HandleSpikes ();
+	
 
 }
 
@@ -109,6 +114,8 @@ void GameSystem::HandleRectangles ()
 	{
 		for (int heroCounter = 0; heroCounter < heroesArray.size (); heroCounter++)
 		{
+			Particle* curHeroCenter =
+				heroesArray[heroCounter]->GetCenter();
 			for (int heroParticleCounter = 0;
 			heroParticleCounter < heroesArray [heroCounter]->GetParticleCount ();
 				heroParticleCounter++)
@@ -118,6 +125,7 @@ void GameSystem::HandleRectangles ()
 
 				if (!(rectanglesArray [rectCounter]->IsInside (curHeroParticle->pos)))
 					continue;
+				curHeroCenter->prevPos = curHeroCenter->pos;
 				curHeroParticle->prevPos = curHeroParticle->pos;
 				curHeroParticle->pos = curHeroParticle->pos +
 					rectanglesArray [rectCounter]->GetMinPerp (curHeroParticle);
@@ -152,3 +160,28 @@ void GameSystem::HandleSpikes ()
 		}
 	}
 }
+
+void GameSystem::CreateHero() {
+	Hero* second = new Hero(this);
+	int count = 10;
+	float pi = 3.1415926f;
+	Vector2f circleCenter = Vector2f(900.0f, 900.0f);
+	second->AddCenter(circleCenter, 5.0f, Vector2f(0.0f, 50.0f));
+	float circleRadius = 25;
+	for (int i = 0; i < count; i++) {
+		float ang = float(i) / count * (2.0f * pi);
+		Vector2f pos = Vector2f(cosf(ang), sinf(ang)) * circleRadius + circleCenter;
+		second->AddParticle(pos, 1.0f, Vector2f(0.0f, 0.0f));
+	}
+	for (int i = 0; i < count; i++) {
+		second->AddLink(second->GetParticle(i), second->GetParticle((i + 1) % count), 0.05f, 1.0f);
+	}
+	for (int i = 0; i < count; i++) {
+		second->AddLink(second->GetParticle(i), second->GetParticle((i + count / 2) % count), 0.05f, 1.0f);
+	}
+	for (int i = 0; i < count; i++) {
+		second->AddLink(second->GetParticle(i), second->GetCenter(), 0.05f, 1.0f);
+	}
+
+	AddObject(second);
+};

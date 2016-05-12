@@ -7,16 +7,28 @@ Hero::Hero(GameSystem *owner) {
 	exist = true;
 }
 
-Particle* Hero::AddParticle(Vector2f pos, float radius)
+Particle* Hero::AddParticle(Vector2f pos, float radius, Vector2f acceleration)
 {
 	Particle* newbie = new Particle;
 	newbie->pos = pos;
 	newbie->prevPos = newbie->pos;
-	newbie->acceleration = Vector2f(0.0f, 30.0f);
+	newbie->acceleration = acceleration;
 	newbie->radius = radius;
 	particles.push_back(newbie);
 
 	return newbie;
+}
+
+Particle* Hero::AddCenter(Vector2f pos, float radius, Vector2f acceleration)
+{
+	Particle* newbie = new Particle;
+	newbie->pos = pos;
+	newbie->prevPos = newbie->pos;
+	newbie->acceleration = acceleration;
+	newbie->radius = radius;
+	center = newbie;
+
+	return center;
 }
 
 VolumeLink* Hero::AddVolumeLink(std::vector<Particle*> particles, float initialPressure, float atmosphericPressure)
@@ -37,6 +49,7 @@ void Hero::Update(float dt)
 	for (size_t particleIndex = 0; particleIndex < particles.size(); particleIndex++)
 	{
 		particles[particleIndex]->Integrate(dt);
+		center->Integrate(dt);
 
 		float floorLevel = 1000;
 		float wall = 1000;
@@ -44,6 +57,7 @@ void Hero::Update(float dt)
 		{
 			particles[particleIndex]->pos.y = floorLevel;
 			particles[particleIndex]->prevPos.x = particles[particleIndex]->pos.x;
+			center->prevPos = center->pos;
 		}
 		if (particles[particleIndex]->pos.y < 0)
 		{
@@ -68,13 +82,15 @@ void Hero::Update(float dt)
 		links[linkIndex]->Solve();
 	}
 
-	volumeLink->Solve();
 }
 
 void Hero::Push(Vector2f step) {
+	if ((center->pos - center->prevPos).Length() < 0.5f)
+		center->pos = center->pos + step;
 	for (int i = 0; i < particles.size(); i++)
-		if((particles[i]->pos - particles[i]->prevPos).Length() < 1.0f)
+		if((particles[i]->pos - particles[i]->prevPos).Length() < 0.5f)
 			particles[i]->pos = particles[i]->pos + step;
+	
 }
 
 void Hero::Draw() {
@@ -89,6 +105,13 @@ Particle* Hero::GetParticle(int particleIndex)
 //	std::cout << "particle index " << particleIndex << std::endl;
 //	std::cout << particles[particleIndex]->pos.x << std::endl;
 	return particles[particleIndex];
+}
+
+Particle* Hero::GetCenter()
+{
+	//	std::cout << "particle index " << particleIndex << std::endl;
+	//	std::cout << particles[particleIndex]->pos.x << std::endl;
+	return center;
 }
 
 size_t Hero::GetParticleCount()
