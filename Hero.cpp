@@ -1,6 +1,27 @@
 #include "Hero.h"
 
-Hero::Hero(GameSystem *owner) {
+Hero::Hero(GameSystem *owner, Vector2f pos, int particleAmount) {
+	int count = particleAmount;
+	float pi = 3.1415926f;
+	Vector2f circleCenter = pos;
+	this->AddCenter(circleCenter, 5.0f, Vector2f(0.0f, 50.0f));
+	float circleRadius = 25;
+	for (int i = 0; i < count; i++) {
+		float ang = float(i) / count * (2.0f * pi);
+		Vector2f pos = Vector2f(cosf(ang), sinf(ang)) * circleRadius + circleCenter;
+		AddParticle(pos, 1.0f, Vector2f(0.0f, 0.0f));
+	}
+	for (int i = 0; i < count; i++) {
+		AddLink(GetParticle(i), GetParticle((i + 1) % count), 0.05f, 1.0f);
+	}
+	for (int i = 0; i < count; i++) {
+		AddLink(GetParticle(i), GetParticle((i + count / 2) % count), 0.05f, 1.0f);
+	}
+	for (int i = 0; i < count; i++) {
+		AddLink(GetParticle(i), GetCenter(), 0.05f, 1.0f);
+	}
+
+
 	this->owner = owner;
 	sprite = Sprite("data/smile.png");
 	sprite2 = Sprite("data/ball.png");
@@ -51,11 +72,9 @@ void Hero::Update(float dt)
 		particles[particleIndex]->Integrate(dt);
 		center->Integrate(dt);
 
-		float floorLevel = 1000;
-		float wall = 1000;
-		if (particles[particleIndex]->pos.y > floorLevel)
+		if (particles[particleIndex]->pos.y > owner->GetGameSize().y)
 		{
-			particles[particleIndex]->pos.y = floorLevel;
+			particles[particleIndex]->pos.y = owner->GetGameSize().y;
 			particles[particleIndex]->prevPos.x = particles[particleIndex]->pos.x;
 			center->prevPos = center->pos;
 		}
@@ -69,9 +88,9 @@ void Hero::Update(float dt)
 			particles[particleIndex]->pos.x = 0;
 			particles[particleIndex]->prevPos.y = particles[particleIndex]->pos.y;
 		}
-		if (particles[particleIndex]->pos.x > wall)
+		if (particles[particleIndex]->pos.x > owner->GetGameSize().x)
 		{
-			particles[particleIndex]->pos.x = wall;
+			particles[particleIndex]->pos.x = owner->GetGameSize().x;
 			particles[particleIndex]->prevPos.y = particles[particleIndex]->pos.y;
 		}
 
@@ -94,9 +113,9 @@ void Hero::Push(Vector2f step) {
 }
 
 void Hero::Draw() {
-	sprite.Draw(owner->GetWindow(), particles);
+	sprite.DrawWorldspace(owner->GetWindow(), particles, owner->cam);
 	for (int i = 0; i < particles.size(); i++) {
-		sprite2.Draw(owner->GetWindow(), particles[i], 0.0f, Vector2f(particles[i]->radius * 2.0f, particles[i]->radius * 2.0f));
+		//sprite2.DrawWorldspace(owner->GetWindow(), particles[i]->pos, 0.0f, Vector2f(particles[i]->radius * 2.0f, particles[i]->radius * 2.0f), owner->cam);
 	}
 }
 

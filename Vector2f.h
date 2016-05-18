@@ -16,6 +16,12 @@ public:
 		x = _x;
 		this->y = _y;
 	}
+
+	Vector2f(float ang) {
+		x = cos(ang);
+		y = sin(ang);
+	}
+
 	~Vector2f ()
 	{ }
 
@@ -68,3 +74,5 @@ Vector2f operator * (Vector2f v0, float param);
 Vector2f operator*(float param, Vector2f v1);
 
 float operator ^ (Vector2f v1, Vector2f v2);
+
+float operator*(Vector2f v1, Vector2f v2);

@@ -1,13 +1,21 @@
 #pragma once
+#include "GameSystem.h"
+#include "Sprite.h"
+#include <math.h>
+#include <string>
 
-#include "Rectangle.h"
+//#include "ParticleSystem.h"
+class Particle; //от кольцевых зависимостей
 
-class Background : public Rectangle
-{
+class Background : public Object {
 public:
-	Background (GameSystem *owner,
-		   Vector2f centre,
-		   float ang,
-		   Vector2f size);
-	~Background () { }
+	Background() {};
+	Background(GameSystem *owner, std::string nameOfFile, float paralax);
+	void Update(float dt) {};
+	void Draw();
+	bool Exist() { return 1; }
+private:
+	Sprite sprite;
+	GameSystem *owner;
+	float paralax;
 };

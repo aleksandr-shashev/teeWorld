@@ -3,19 +3,29 @@
 #include "GameSystem.h"
 #include "Rectangle.h"
 #include "Hero.h"
+#include "Bomb.h"
 #include "Spike.h"
 
 
-GameSystem::GameSystem (sf::RenderWindow *wnd) {
+GameSystem::GameSystem (sf::RenderWindow *wnd, Vector2f gameSize) {
 	this->wnd = wnd;
+	this->gameSize = gameSize;
+	cam.pos.x = gameSize.x / 2.0f;
+	cam.pos.y = gameSize.y / 2.0f;
+	cam.fieldOfView = wnd->getSize().x;
+	cam.ang = 0.0f;
 }
 
+int GameSystem::GetHeroAmount() {
+	return heroesArray.size();
+};
 
 void GameSystem::Update(float dt) 
 {
 	
 	if (heroesArray.size() == 0) {
-		CreateHero();
+		Hero* second = new Hero(this, Vector2f(600.0f, 600.0f), 10);
+		AddObject(second);
 	}
 
 	for (unsigned int object = 0; object < objectsArray.size(); object++) 
@@ -34,6 +44,7 @@ void GameSystem::Update(float dt)
 			i++;
 	}
 
+	GarbageCollector(bombsArray);
 	GarbageCollector (heroesArray);
 	GarbageCollector (rectanglesArray);
 
@@ -44,24 +55,26 @@ void GameSystem::Update(float dt)
 
 	if (heroesArray.size ())
 	{
-		if (sf::Keyboard::isKeyPressed (sf::Keyboard::D))
-		{
-			(heroesArray [0])->Push (Vector2f (step, 0.0f));
-		}
-		if (sf::Keyboard::isKeyPressed (sf::Keyboard::A))
-		{
-			(heroesArray [0])->Push (Vector2f (-step, 0.0f));
-		}
-		if (sf::Keyboard::isKeyPressed (sf::Keyboard::W))
-		{
-			if (CanJump (0))
+		if ((heroesArray[0]->GetCenter()->pos - heroesArray[0]->GetCenter()->prevPos).Length() < 0.08f) {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			{
-				(heroesArray [0])->Push (Vector2f (0.0f, -1.5f));
+				(heroesArray[0])->Push(Vector2f(step, 0.0f));
 			}
-		}
-		if (sf::Keyboard::isKeyPressed (sf::Keyboard::S))
-		{
-			(heroesArray [0])->Push (Vector2f (0.0f, step));
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+			{
+				(heroesArray[0])->Push(Vector2f(-step, 0.0f));
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			{
+				if (CanJump(0))
+				{
+					(heroesArray[0])->Push(Vector2f(0.0f, -1.5f));
+				}
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+			{
+				(heroesArray[0])->Push(Vector2f(0.0f, step));
+			}
 		}
 	}
 
@@ -78,6 +91,10 @@ void GameSystem::Draw() {
 
 sf::RenderWindow *GameSystem::GetWindow() {
 	return wnd;
+}
+
+Vector2f GameSystem::GetGameSize() {
+	return gameSize;
 }
 
 bool GameSystem::CanJump(int hero) 
@@ -129,8 +146,42 @@ void GameSystem::HandleRectangles ()
 				curHeroParticle->prevPos = curHeroParticle->pos;
 				curHeroParticle->pos = curHeroParticle->pos +
 					rectanglesArray [rectCounter]->GetMinPerp (curHeroParticle);
-				if (rectCounter != 0)
-					rectanglesArray [rectCounter]->Kill ();
+				//if (rectCounter != 0)
+					//rectanglesArray [rectCounter]->Kill ();
+			}
+		}
+
+		for (int bombCounter = 0; bombCounter < bombsArray.size(); bombCounter++)
+		{
+			Particle* curBombCenter =
+				bombsArray[bombCounter]->GetCenter();
+			for (int bombParticleCounter = 0;
+			bombParticleCounter < bombsArray[bombCounter]->GetParticleCount();
+				bombParticleCounter++)
+			{
+				Particle* curBombParticle =
+					bombsArray[bombCounter]->GetParticle(bombParticleCounter);
+
+				if (!(rectanglesArray[rectCounter]->IsInside(curBombParticle->pos)))
+					continue;
+
+				if (bombsArray[bombCounter]->GetParticleCount() > 3) {
+					Vector2f speed = rectanglesArray[rectCounter]->GetMinPerp(curBombParticle);
+					speed = speed.GetNorm() * 4.0f;
+					Vector2f pos = bombsArray[bombCounter]->GetCenter()->pos;
+					Bomb* third = new Bomb(this, pos, bombsArray[bombCounter]->GetParticleCount() - 1, speed * 1.25f, bombsArray[bombCounter]->GetRadius() * 0.7f);
+					AddObject(third);
+					Vector2f speed2 = speed + speed.GetPerp() * speed.Length() * 0.25f;
+					third = new Bomb(this, pos, bombsArray[bombCounter]->GetParticleCount() - 1, speed2, bombsArray[bombCounter]->GetRadius() * 0.7f);
+					AddObject(third);
+					speed2 = speed - speed.GetPerp() * speed.Length() * 0.25f;
+					third = new Bomb(this, pos, bombsArray[bombCounter]->GetParticleCount() - 1, speed2, bombsArray[bombCounter]->GetRadius() * 0.7f);
+					AddObject(third);
+				}
+				bombsArray[bombCounter]->Kill();
+				
+				//if (rectCounter != 0)
+					//rectanglesArray[rectCounter]->Kill();
 			}
 		}
 	}
@@ -160,28 +211,3 @@ void GameSystem::HandleSpikes ()
 		}
 	}
 }
-
-void GameSystem::CreateHero() {
-	Hero* second = new Hero(this);
-	int count = 10;
-	float pi = 3.1415926f;
-	Vector2f circleCenter = Vector2f(900.0f, 900.0f);
-	second->AddCenter(circleCenter, 5.0f, Vector2f(0.0f, 50.0f));
-	float circleRadius = 25;
-	for (int i = 0; i < count; i++) {
-		float ang = float(i) / count * (2.0f * pi);
-		Vector2f pos = Vector2f(cosf(ang), sinf(ang)) * circleRadius + circleCenter;
-		second->AddParticle(pos, 1.0f, Vector2f(0.0f, 0.0f));
-	}
-	for (int i = 0; i < count; i++) {
-		second->AddLink(second->GetParticle(i), second->GetParticle((i + 1) % count), 0.05f, 1.0f);
-	}
-	for (int i = 0; i < count; i++) {
-		second->AddLink(second->GetParticle(i), second->GetParticle((i + count / 2) % count), 0.05f, 1.0f);
-	}
-	for (int i = 0; i < count; i++) {
-		second->AddLink(second->GetParticle(i), second->GetCenter(), 0.05f, 1.0f);
-	}
-
-	AddObject(second);
-};

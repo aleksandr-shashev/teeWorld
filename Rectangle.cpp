@@ -1,19 +1,20 @@
 #include "Rectangle.h"
 #include <iostream>
 
-Rectangle::Rectangle(GameSystem *owner, Vector2f centre, float ang, Vector2f size, std::string spriteFileName) {
+Rectangle::Rectangle(GameSystem *owner, Vector2f centre, float ang, Vector2f size, std::string spriteFileName, float texScale) {
 	this->owner = owner;
 	this->ang = ang;
 	this->centre = centre;
 	this->size = size;
 	this->exist = true;
+	this->texScale = texScale;
 
-	sprite = Sprite(spriteFileName);
+	sprite = Sprite(spriteFileName, texScale);
 	sprite2 = Sprite("data/ball.png");
 
 	Vector2f points[4];
 	Vector2f pointPos;
-	Vector2f xVector = Vector2f(cosf(ang), sinf(ang));
+	Vector2f xVector = Vector2f(ang);
 	Vector2f yVector = xVector.GetPerp();
 
 	pointPos = centre - xVector * size.x * 0.5f - yVector * size.y * 0.5f;
@@ -44,10 +45,11 @@ Rectangle::Rectangle(GameSystem *owner, Vector2f centre, float ang, Vector2f siz
 void Rectangle::Update(float dt)
 { }
 
+
 void Rectangle::Draw() {
-	sprite.Draw(owner->GetWindow(), centre, this->ang, this->size);
+	sprite.DrawWorldspace(owner->GetWindow(), centre, this->ang, this->size, owner->cam, texScale);
 	for (int i = 0; i < particles.size(); i++) {
-		sprite2.Draw(owner->GetWindow(), particles[i], 0.0f, Vector2f(particles[i]->radius * 2.0f, particles[i]->radius * 2.0f));
+		//sprite2.DrawWorldspace(owner->GetWindow(), particles[i]->pos, 0.0f, Vector2f(particles[i]->radius * 2.0f, particles[i]->radius * 2.0f), owner->cam);
 	}
 }
 
