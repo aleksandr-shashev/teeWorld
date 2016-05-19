@@ -20,15 +20,8 @@ int main()
 
 	GameSystem sys(&window, gameSize);
 
-	Background* newFon = new Background(&sys, "data/Sky.png", 0.f);
+	Background* newFon = new Background(&sys, "data/fon.png", 1.0f);
 	sys.AddObject(newFon);
-	newFon = new Background(&sys, "data/tree.png", 0.8f);
-	sys.AddObject(newFon);
-	newFon = new Background(&sys, "data/grace.png", 1.0f);
-	sys.AddObject(newFon);
-
-	//Background* newFon = new Background(&sys, "data/fon.png", 1.0f);
-	//sys.AddObject(newFon);
 
 	Cloud* oblako = new Cloud(&sys, Vector2f(2400.0f, 300.0f), 0.0f, Vector2f(600.0f, 400.0f), "data/oblako1.png", 40.0f);
 	sys.AddObject(oblako);
