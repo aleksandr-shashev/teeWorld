@@ -142,7 +142,7 @@ void Sprite::DrawBackground(sf::RenderWindow *wnd, Camera cam, float paralax) {
 	float fovx = cam.fieldOfView;
 	float fovy = fovx * wnd->getSize().y / wnd->getSize().x;
 
-	Vector2f camPos = cam.pos * paralax;
+	Vector2f camPos = Vector2f(cam.pos.x * paralax, cam.pos.y);
 
 	vertexPos = camPos - xVector * fovx * 0.5f - yVector * fovy * 0.5f;
 	//vertexPos = vertexPos * 2.0f;
