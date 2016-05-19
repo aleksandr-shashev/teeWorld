@@ -1,11 +1,8 @@
 #include "Background.h"
 
-Background::Background(GameSystem *owner, std::string nameOfFile, float paralax) {
-	this->owner = owner;
-	sprite = Sprite(nameOfFile);
-	this->paralax = paralax;
-}
-
-void Background::Draw() {
-	sprite.DrawBackground(owner->GetWindow(), owner->cam, paralax);
-}
+Background::Background (GameSystem *owner,
+						Vector2f centre,
+						float ang,
+						Vector2f size) :
+	Rectangle (owner, centre, ang, size, std::string ("data/background.jpg"))
+{ }

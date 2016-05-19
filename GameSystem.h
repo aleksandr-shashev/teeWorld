@@ -7,14 +7,11 @@
 #include "Defines.h"
 #include "Vector2f.h"
 #include "Particle.h"
-#include "Sprite.h"
 
 class Hero;
 class Rectangle;
 class Spike;
 class Background;
-class Bomb;
-class Cloud;
 
 class Object
 {
@@ -23,8 +20,8 @@ public:
 	virtual void Draw() = 0;
 	virtual bool Exist () = 0;
 
-	virtual size_t GetParticleCount() { return 0; };
-	virtual Particle* GetParticle(int particleIndex) { return NULL; };
+	virtual size_t GetParticleCount () = 0;
+	virtual Particle* GetParticle (int particleIndex) = 0;
 	virtual void Push(Vector2f step) {};
 	virtual Vector2f GetMinPerp (Particle* point) { return Vector2f (0.0f, 0.0f); }
 	virtual bool IsInside (Vector2f pos) { return false; }
@@ -35,7 +32,7 @@ class GameSystem
 {
 public:
 	GameSystem() {};
-	GameSystem(sf::RenderWindow *wnd, Vector2f gameSize);
+	GameSystem(sf::RenderWindow *wnd);
 	void Update(float dt);
 	void Draw();
 
@@ -54,15 +51,6 @@ public:
 	}
 
 	template <>
-	Object *AddObject(Bomb *candidate)
-	{
-		objectsArray.push_back((Object*)candidate);
-
-		bombsArray.push_back(candidate);
-		return objectsArray.back();
-	}
-
-	template <>
 	Object *AddObject (Rectangle *candidate)
 	{
 		objectsArray.push_back ((Object*)candidate);
@@ -78,13 +66,6 @@ public:
 
 		spikesArray.push_back (candidate);
 		return objectsArray.back ();
-	}
-	Object *AddObject(Cloud *candidate)
-	{
-		objectsArray.push_back((Object*)candidate);
-
-		cloudsArray.push_back(candidate);
-		return objectsArray.back();
 	}
 	template <>
 	Object *AddObject (Background* candidate)
@@ -109,14 +90,6 @@ public:
 	}
 
 	template <>
-	Bomb *GetObject(int pos)
-	{
-		if (bombsArray.size() > pos)
-			return bombsArray[pos];
-		return NULL;
-	}
-
-	template <>
 	Rectangle *GetObject (int pos)
 	{
 		if (rectanglesArray.size () > pos)
@@ -133,14 +106,6 @@ public:
 	}
 
 	template <>
-	Cloud *GetObject(int pos)
-	{
-		if (cloudsArray.size() > pos)
-			return cloudsArray[pos];
-		return NULL;
-	}
-
-	template <>
 	Background *GetObject (int pos)
 	{
 		if (backgroundsArray.size () > pos)
@@ -150,21 +115,17 @@ public:
 
 	
 	sf::RenderWindow *GetWindow();
-	bool CanJump(int hero);
-	Vector2f GetGameSize();
-	int GetHeroAmount();
-	Camera cam;
+	bool GameSystem::CanJump(int hero);
+	void GameSystem::CreateHero();
+
 private:
 	std::vector <Object *> objectsArray;
 	std::vector <Hero *> heroesArray;
 	std::vector <Rectangle *> rectanglesArray;
 	std::vector <Spike *> spikesArray;
 	std::vector <Background *> backgroundsArray;
-	std::vector <Bomb *> bombsArray;
-	std::vector <Cloud *> cloudsArray;
 	//Particle 
 	sf::RenderWindow *wnd;
-	Vector2f gameSize;
 
 	template <class Data_T>
 	void GarbageCollector (Data_T& array)

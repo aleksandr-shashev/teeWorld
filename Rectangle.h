@@ -11,8 +11,7 @@ public:
 			   Vector2f centre, 
 			   float ang, 
 			   Vector2f size, 
-			   std::string spriteFileName,
-			   float texScale = 0.0f);
+			   std::string spriteFileName = std::string ("data/wall.jpg"));
 	
 	~Rectangle() {};
 	void Update(float dt);
@@ -34,5 +33,4 @@ protected:
 	Sprite sprite2;
 	GameSystem *owner;
 	bool exist;
-	float texScale;
 };

@@ -10,7 +10,7 @@ class Hero : public Object
 {
 public:
 	Hero() {};
-	Hero(GameSystem *owner, Vector2f pos, int particleAmount);
+	Hero(GameSystem *owner);
 	~Hero() {};
 	Particle* AddParticle(Vector2f pos, float radius, Vector2f acceleration);
 	Particle* AddCenter(Vector2f pos, float radius, Vector2f acceleration);
